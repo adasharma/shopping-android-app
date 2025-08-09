@@ -1,5 +1,7 @@
 package com.vishalgaur.shoppingapp
 
+import android.content.Context
+import com.google.firebase.FirebaseApp
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -69,6 +71,14 @@ internal fun getAddressId(userId: String): String {
 	return "$userId-$uniqueId"
 }
 
-internal fun shouldBypassOTPValidation() : Boolean {
-	return false
+internal fun shouldBypassOTPValidation(): Boolean {
+	return try {
+		// If default app exists anywhere (app context provided at runtime), don’t bypass
+		FirebaseApp.getInstance()
+		false
+	} catch (_: IllegalStateException) {
+		true
+	} catch (_: Throwable) {
+		true
+	}
 }

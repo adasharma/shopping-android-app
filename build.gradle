@@ -1,29 +1,31 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext {
-        kotlin_version = "1.4.32"
-        lifecycle_version = "2.3.1"
-        room_version = "2.3.0"
-        glide_version = "4.11.0"
-    }
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.1.3"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:4.3.5'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        // Keep Google Services on the classpath to allow conditional apply in app module
+        classpath 'com.google.gms:google-services:4.4.2'
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+    }
+    configurations.all { cfg ->
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.xerial' && details.requested.name == 'sqlite-jdbc') {
+                details.useVersion '3.45.2.0'
+                details.because 'Ensure macOS aarch64 native library is available for Room verifier'
+            }
+            if (details.requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion '2.0.21'
+                details.because 'Align Kotlin libs with Kotlin Gradle plugin (avoid stdlib 2.2.0 causing compiler ICE)'
+            }
+        }
     }
 }
 

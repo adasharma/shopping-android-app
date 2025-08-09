@@ -1,19 +1,18 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-    id 'com.google.gms.google-services'
-    id 'kotlin-parcelize'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+    id 'org.jetbrains.kotlin.plugin.parcelize'
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    namespace 'com.vishalgaur.shoppingapp'
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.vishalgaur.shoppingapp"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0"
 
@@ -31,87 +30,106 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
-    packagingOptions {
-        exclude 'META-INF/AL2.0'
-        exclude 'META-INF/LGPL2.1'
+    packaging {
+        resources {
+            excludes += ['META-INF/AL2.0', 'META-INF/LGPL2.1']
+        }
     }
+}
+
+repositories {
+    google()
+    mavenCentral()
 }
 
 dependencies {
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    // Align Kotlin libs with the Kotlin Gradle plugin
+    implementation platform("org.jetbrains.kotlin:kotlin-bom:2.0.21")
 
-    // Source: https://github.com/Kotlin/kotlinx.coroutines/tree/master/integration/kotlinx-coroutines-play-services
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.1'
-
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
-
-    // RecyclerView - beta with ConcatAdapter (previously MergeAdapter)
-    implementation "androidx.recyclerview:recyclerview:1.2.0"
-
-    // Room
-    implementation "androidx.room:room-runtime:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    kapt "androidx.room:room-compiler:$room_version"
-
-    // ViewModel and LiveData
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation 'com.google.firebase:firebase-analytics'
+    // Firebase platform and libraries (BoM first)
+    implementation platform('com.google.firebase:firebase-bom:33.5.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-auth-ktx'
-
-    // Glide
-    implementation "com.github.bumptech.glide:glide:$glide_version"
-
-    //Firebase
-    implementation platform('com.google.firebase:firebase-bom:27.0.0')
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
 
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib:2.2.0"
+
+    // Source: https://github.com/Kotlin/kotlinx.coroutines/tree/master/integration/kotlinx-coroutines-play-services
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2'
+
+    implementation 'androidx.core:core-ktx:1.16.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.9.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.9.3'
+
+    // RecyclerView - beta with ConcatAdapter (previously MergeAdapter)
+    implementation "androidx.recyclerview:recyclerview:1.4.0"
+
+    // Room
+    implementation "androidx.room:room-runtime:2.7.2"
+    implementation "androidx.room:room-ktx:2.7.2"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    //noinspection KaptUsageInsteadOfKsp
+    kapt "androidx.room:room-compiler:2.7.2"
+    kapt "org.xerial:sqlite-jdbc:3.50.3.0"
+
+    // ViewModel and LiveData
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2"
+
+    // Glide
+    implementation "com.github.bumptech.glide:glide:4.16.0"
+
+    // Gson for Room type converters
+    implementation 'com.google.code.gson:gson:2.10.1'
+
     // Testing
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.2"
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.3.0"
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 
     // AndroidJUnitRunner and JUnit Rules
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation 'androidx.test:rules:1.7.0'
 
     // espresso for intents
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.7.0'
 
     //espresso for recyclerview
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.7.0'
 
     // AndroidX Test - JVM testing
-    testImplementation "androidx.test.ext:junit-ktx:1.1.2"
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
-    testImplementation "androidx.test:core-ktx:1.3.0"
+    testImplementation "androidx.test.ext:junit-ktx:1.3.0"
+    testImplementation "androidx.arch.core:core-testing:2.2.0"
+    testImplementation "androidx.test:core-ktx:1.7.0"
 
-    testImplementation "org.robolectric:robolectric:4.3.1"
+    testImplementation "org.robolectric:robolectric:4.15.1"
 
-    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
 
 
     // testing coroutines
-    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3'
+    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
 
     //fragment testing
-    debugImplementation "androidx.fragment:fragment-testing:1.3.3"
+    debugImplementation "androidx.fragment:fragment-testing:1.8.8"
 
     //navigation testing
-    androidTestImplementation "androidx.navigation:navigation-testing:2.3.5"
+    androidTestImplementation "androidx.navigation:navigation-testing:2.9.3"
+}
+
+// Apply Google Services only if the JSON config is present
+if (file('google-services.json').exists()) {
+    apply plugin: 'com.google.gms.google-services'
 }

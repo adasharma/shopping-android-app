@@ -111,7 +111,7 @@
     <string name="add_address_phone_label_text">Phone Number</string>
     <string name="county_hint">India</string>
     <string name="add_address_zipcode_label_text">Zip Code</string>
-    <string name="person_name">%s %s</string>
+    <string name="person_name">%1$s %2$s</string>
     <string name="save_address_error_text">Error Saving Address!</string>
     <string name="ship_to_error_empty">Please select an address!</string>
     <string name="delete_address_message_text">On clicking Delete, Address will be deleted premanently!</string>
@@ -145,7 +145,7 @@
     <string name="order_summary_items_label">Items</string>
     <string name="no_orders_placed_text">Nothing To Show</string>
     <string name="orders_fragment_title">Orders</string>
-    <string name="order_date_text">Ordered On : %s %s, %s</string>
+    <string name="order_date_text">Ordered On : %1$s %2$s, %3$s</string>
     <string name="order_items_count_text">%s items purchased</string>
     <string name="products_label_text">Products</string>
     <string name="shipping_details_label_text">Shipping Details</string>

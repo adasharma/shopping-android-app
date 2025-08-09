@@ -2,6 +2,9 @@ package com.vishalgaur.shoppingapp
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.vishalgaur.shoppingapp.data.ShoppingAppSessionManager
 import com.vishalgaur.shoppingapp.data.source.ProductDataSource
 import com.vishalgaur.shoppingapp.data.source.UserDataSource
@@ -9,6 +12,8 @@ import com.vishalgaur.shoppingapp.data.source.local.ProductsLocalDataSource
 import com.vishalgaur.shoppingapp.data.source.local.ShoppingAppDatabase
 import com.vishalgaur.shoppingapp.data.source.local.UserLocalDataSource
 import com.vishalgaur.shoppingapp.data.source.remote.AuthRemoteDataSource
+import com.vishalgaur.shoppingapp.data.source.remote.NoopAuthRemoteDataSource
+import com.vishalgaur.shoppingapp.data.source.remote.NoopProductsRemoteDataSource
 import com.vishalgaur.shoppingapp.data.source.remote.ProductsRemoteDataSource
 import com.vishalgaur.shoppingapp.data.source.repository.AuthRepoInterface
 import com.vishalgaur.shoppingapp.data.source.repository.AuthRepository
@@ -52,16 +57,24 @@ object ServiceLocator {
 	}
 
 	private fun createProductsRepository(context: Context): ProductsRepoInterface {
-		val newRepo =
-			ProductsRepository(ProductsRemoteDataSource(), createProductsLocalDataSource(context))
+		val remote: ProductDataSource = if (isFirebaseAvailable(context)) {
+			ProductsRemoteDataSource()
+		} else {
+			NoopProductsRemoteDataSource()
+		}
+		val newRepo = ProductsRepository(remote, createProductsLocalDataSource(context))
 		productsRepository = newRepo
 		return newRepo
 	}
 
 	private fun createAuthRepository(context: Context): AuthRepoInterface {
 		val appSession = ShoppingAppSessionManager(context.applicationContext)
-		val newRepo =
-			AuthRepository(createUserLocalDataSource(context), AuthRemoteDataSource(), appSession)
+		val remote: UserDataSource = if (isFirebaseAvailable(context)) {
+			AuthRemoteDataSource()
+		} else {
+			NoopAuthRemoteDataSource()
+		}
+		val newRepo = AuthRepository(createUserLocalDataSource(context), remote, appSession)
 		authRepository = newRepo
 		return newRepo
 	}
@@ -74,5 +87,16 @@ object ServiceLocator {
 	private fun createUserLocalDataSource(context: Context): UserDataSource {
 		val database = database ?: ShoppingAppDatabase.getInstance(context.applicationContext)
 		return UserLocalDataSource(database.userDao())
+	}
+
+	private fun isFirebaseAvailable(context: Context): Boolean {
+		return try {
+			if (FirebaseApp.getApps(context).isNotEmpty()) true else {
+				Firebase.firestore
+				true
+			}
+		} catch (_: Throwable) {
+			false
+		}
 	}
 }

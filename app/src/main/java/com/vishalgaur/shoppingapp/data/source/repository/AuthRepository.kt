@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.ktx.Firebase as FirebaseKtx
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.vishalgaur.shoppingapp.data.Result
 import com.vishalgaur.shoppingapp.data.Result.Error
 import com.vishalgaur.shoppingapp.data.Result.Success
@@ -28,13 +28,19 @@ class AuthRepository(
 	private var sessionManager: ShoppingAppSessionManager
 ) : AuthRepoInterface {
 
-	private var firebaseAuth: FirebaseAuth = Firebase.auth
+	private var firebaseAuth: FirebaseAuth? = null
 
 	companion object {
 		private const val TAG = "AuthRepository"
 	}
 
-	override fun getFirebaseAuth() = firebaseAuth
+	override fun getFirebaseAuth(): FirebaseAuth {
+		// Initialize lazily to avoid crashes when Firebase isn’t configured
+		if (firebaseAuth == null) {
+			firebaseAuth = FirebaseKtx.auth
+		}
+		return firebaseAuth!!
+	}
 
 	override fun isRememberMeOn() = sessionManager.isRememberMeOn()
 
@@ -127,7 +133,7 @@ class AuthRepository(
 		isUserLoggedIn: MutableLiveData<Boolean>, context: Context
 	) {
 		try {
-			firebaseAuth.signInWithCredential(credential)
+			getFirebaseAuth().signInWithCredential(credential)
 				.addOnCompleteListener { task ->
 					if (task.isSuccessful) {
 						Log.d(TAG, "signInWithCredential:success")
@@ -156,7 +162,10 @@ class AuthRepository(
 
 	override suspend fun signOut() {
 		sessionManager.logoutFromSession()
-		firebaseAuth.signOut()
+		try {
+			firebaseAuth?.signOut()
+		} catch (_: Exception) {
+		}
 		userLocalDataSource.clearUser()
 	}
 

@@ -97,11 +97,13 @@ class AddEditProductFragment : Fragment() {
 					binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
 					binding.loaderLayout.circularLoader.showAnimationBehavior
 				}
+
 				StoreDataStatus.DONE -> {
 					binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
 					binding.loaderLayout.circularLoader.hideAnimationBehavior
 					fillDataInAllViews()
 				}
+
 				else -> {
 					binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
 					binding.loaderLayout.circularLoader.hideAnimationBehavior
@@ -115,13 +117,16 @@ class AddEditProductFragment : Fragment() {
 					binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
 					binding.loaderLayout.circularLoader.showAnimationBehavior
 				}
+
 				AddProductErrors.ERR_ADD_IMG -> {
 					setAddProductErrors(getString(R.string.add_product_error_img_upload))
 				}
+
 				AddProductErrors.ERR_ADD -> {
 					setAddProductErrors(getString(R.string.add_product_insert_error))
 				}
-				AddProductErrors.NONE -> {
+
+				AddProductErrors.NONE, null -> {
 					binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
 					binding.loaderLayout.circularLoader.hideAnimationBehavior
 				}
@@ -288,6 +293,7 @@ class AddEditProductFragment : Fragment() {
 				binding.addProErrorTextView.visibility = View.VISIBLE
 				binding.addProErrorTextView.text = getString(R.string.add_product_error_string)
 			}
+
 			AddProductViewErrors.ERR_PRICE_0 -> {
 				binding.addProErrorTextView.visibility = View.VISIBLE
 				binding.addProErrorTextView.text = getString(R.string.add_pro_error_price_string)

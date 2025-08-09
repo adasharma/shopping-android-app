@@ -2,7 +2,7 @@ package com.vishalgaur.shoppingapp.data.source.local
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.vishalgaur.shoppingapp.data.Product
 import com.vishalgaur.shoppingapp.data.Result
 import com.vishalgaur.shoppingapp.data.Result.*
@@ -17,25 +17,17 @@ class ProductsLocalDataSource internal constructor(
 ) : ProductDataSource {
 	override fun observeProducts(): LiveData<Result<List<Product>>?> {
 		return try {
-			Transformations.map(productsDao.observeProducts()) {
-				Success(it)
-			}
+			productsDao.observeProducts().map { products -> Success(products) }
 		} catch (e: Exception) {
-			Transformations.map(MutableLiveData(e)) {
-				Error(e)
-			}
+			MutableLiveData(Result.Error(e))
 		}
 	}
 
 	override fun observeProductsByOwner(ownerId: String): LiveData<Result<List<Product>>?> {
 		return try {
-			Transformations.map(productsDao.observeProductsByOwner(ownerId)) {
-				Success(it)
-			}
+			productsDao.observeProductsByOwner(ownerId).map { products -> Success(products) }
 		} catch (e: Exception) {
-			Transformations.map(MutableLiveData(e)) {
-				Error(e)
-			}
+			MutableLiveData(Result.Error(e))
 		}
 	}
 

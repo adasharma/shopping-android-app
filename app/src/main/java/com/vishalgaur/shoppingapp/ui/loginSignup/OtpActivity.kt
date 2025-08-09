@@ -26,7 +26,7 @@ class OtpActivity : AppCompatActivity() {
 		private val application: Application, private val uData: UserData
 	) : ViewModelProvider.Factory {
 		@Suppress("UNCHECKED_CAST")
-		override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+		override fun <T : ViewModel> create(modelClass: Class<T>): T {
 			if (modelClass.isAssignableFrom(OtpViewModel::class.java)) {
 				return OtpViewModel(application, uData) as T
 			}

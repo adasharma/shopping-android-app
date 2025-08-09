@@ -3,6 +3,7 @@ package com.vishalgaur.shoppingapp.viewModels
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import androidx.lifecycle.switchMap
 import com.vishalgaur.shoppingapp.ShoppingApplication
 import com.vishalgaur.shoppingapp.data.Product
 import com.vishalgaur.shoppingapp.data.Result
@@ -13,7 +14,7 @@ import com.vishalgaur.shoppingapp.data.UserData
 import com.vishalgaur.shoppingapp.data.utils.StoreDataStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.time.Month
+import java.text.SimpleDateFormat
 import java.util.*
 
 private const val TAG = "HomeViewModel"
@@ -32,7 +33,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 	private var _products = MutableLiveData<List<Product>>()
 	val products: LiveData<List<Product>> get() = _products
 
-	private lateinit var _allProducts: MutableLiveData<List<Product>>
+	private lateinit var _allProducts: LiveData<List<Product>>
 	val allProducts: LiveData<List<Product>> get() = _allProducts
 
 	private var _userProducts = MutableLiveData<List<Product>>()
@@ -136,9 +137,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	private fun getProducts() {
-		_allProducts = Transformations.switchMap(productsRepository.observeProducts()) {
-			getProductsLiveData(it)
-		} as MutableLiveData<List<Product>>
+		_allProducts = productsRepository.observeProducts().switchMap { result ->
+			getProductsLiveData(result)
+		}
 		viewModelScope.launch {
 			_storeDataStatus.value = StoreDataStatus.LOADING
 			val res = async { productsRepository.refreshProducts() }
@@ -204,10 +205,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
 	private fun getProductsByOwner() {
 		_allProducts =
-			Transformations.switchMap(productsRepository.observeProductsByOwner(currentUser!!)) {
-				Log.d(TAG, it.toString())
-				getProductsLiveData(it)
-			} as MutableLiveData<List<Product>>
+			productsRepository.observeProductsByOwner(currentUser!!).switchMap { result ->
+				Log.d(TAG, result.toString())
+				getProductsLiveData(result)
+			}
 		viewModelScope.launch {
 			_storeDataStatus.value = StoreDataStatus.LOADING
 			val res = async { productsRepository.refreshProducts() }
@@ -298,11 +299,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun onSetStatusOfOrder(orderId: String, status: String) {
-		val currDate = Calendar.getInstance()
-		val dateString =
-			"${Month.values()[(currDate.get(Calendar.MONTH))].name} ${
-				currDate.get(Calendar.DAY_OF_MONTH)
-			}, ${currDate.get(Calendar.YEAR)}"
+		val currDate = Calendar.getInstance().time
+		val formatter = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
+		val dateString = formatter.format(currDate)
 		Log.d(TAG, "Selected Status is $status ON $dateString")
 		setStatusOfOrder(orderId, "$status ON $dateString")
 	}
